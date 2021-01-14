@@ -1,0 +1,10 @@
+colaEspecial c;
+int sig = -1;
+
+process personas[i:1..n]{
+	int id = -1;
+	<if sig == -1 sig = i else c.push(i)>;
+	<await (sig == i)>;
+	impresora.imprimir(documento);
+	<if empty(c) sig = -1 else sig = c.pop()>;
+}

@@ -1,0 +1,27 @@
+task type usuario is;
+task servidor is;
+
+task servidor is
+	entry acreditar(in doc: string,out r: boolean);
+end servidor;
+
+task body servidor is
+	loop
+		accept acreditar(in doc : string; out r: boolean) is
+			r:= analizarDocumento(doc);
+		end analizar;
+	end loop;
+end servidor;
+
+task body usuario is
+  doc: string; res: boolean;
+  res:= false;
+  while not res loop
+		doc:= prepararDocumento(doc);
+		select
+		    servidor.acreditar(doc,res);
+		or
+		   delay(120);
+		     delay(60);
+  end loop;
+end usuario;

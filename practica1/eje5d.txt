@@ -1,0 +1,29 @@
+program eje5d
+
+recurso impresora
+array of boolean imprimiendo[n]
+queue cola;
+boolean imprimio=false;
+
+process tarea[i:0..n]{
+   while(true){
+     <cola.encolar(i)>;
+     <await (llegada[i])>;
+     <impresora.imprimir()>;
+     <imprimio=true>;
+
+   }
+}
+
+process coordinador{
+int id;
+
+  while (true){
+    <await (!cola.empty())>;
+    <id=cola.desencolar()>;
+    <imprimio=false>;
+	<llegada[id]=true>;
+    <await imprimio>
+
+  }
+}

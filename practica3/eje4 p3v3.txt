@@ -1,0 +1,123 @@
+
+
+process cliente[i:1..n]{
+string estado="";
+	banco.llegar(i);
+	estado[i].iniciarTimer();
+	estado[i].esperarEirse(estado);
+	printf("retirandose ",estado);
+	
+}
+
+process empleado[i:1..2]{
+int idCliente=-1; 
+	while true{
+		banco.proximo(idCliente);
+		estado[idCliente].atender();
+	}	
+}
+
+
+monitor banco{
+queue clientes;
+cond empleado
+int cantclientes=0; esperando=0;
+bool ocupado=false;
+
+	procedure llegar(int in id)
+	{
+		clientes.push(id);
+		if (esperando>0){
+			esperando--
+			signal(empleado)
+		}else
+			cantclientes++;
+		
+	}
+
+	procedure proximo(int out idCliente){
+		if (cantclientes==0){
+			esperando++;
+			wait(empleado);
+
+		}
+	   cantclientes--	
+	   idCliente = clientes.pop();		
+	}
+
+
+
+
+	
+}
+
+
+process timer[i:1..n]{
+   estado[i].iniciar();
+   delay(15minutos);
+   estado[i].retirarse();
+}
+
+
+monitor estado[e:1..n]{
+	bool inicio=false; ret=false;
+	cond ini, ir
+	string estado="";
+	
+	procedure iniciarTimer(){
+		if (not inicio){
+			inicio = true;
+		}
+	}
+	
+	procedure iniciar(){
+		if (inicio){
+			estado = "esperando";
+			signal(ini);
+		}else
+			wait (ini);
+	}
+	
+	procedure retirarse(){
+		if (inicio) {
+			inicio = false;
+			estado = "sin ser atendido";
+			ret = true;
+			signal(ir);
+		}
+	}
+	
+	procedure atender(){
+		if (estado == "esperando"){
+			estado = "atendido";
+			ret = true;
+			signal(ir);
+		}
+	}
+
+	
+	
+	procedure esperarEirse(string out e){
+	  if not ret{	
+		wait (ir);
+		e = estado;
+	  }
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

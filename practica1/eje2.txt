@@ -1,0 +1,40 @@
+program eje2{
+const M;
+int vec[n];
+int total = 0;
+
+process contar[i:0..3]{
+	int c = 0;
+	int ini = calculaInicio(m,i);
+    int hasta = calculaFin(m,i);
+    for j=ini to hasta do{
+      if(vec[j]== M) c++;
+	}		
+	<if (c > 0) total = total + c>;
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

@@ -1,0 +1,36 @@
+process jugador[i:1..20]{
+   int gr, monedas, total;	
+   gr = asinoGrupo();
+   equipo[gr].llegar();
+   for (int j = 1; j <= 15; j++){
+	   monedas = monedas + moneda();
+   }
+   equipo[gr].verTotal(monedas,total);
+}
+
+monitor equipo[i:1..5]{
+	int cant = 0, monto = 0;
+	cond jug;
+	
+	procedure llegar(){
+		cant++;
+		if (cant < 4)
+			wait (jug);
+		else
+		{
+			signal all(jug);
+			cant = 0;
+		}		
+	}
+	
+
+	procedure verTotal(int: monedas in; int : total out){
+        cant++;
+		monto = monto + monedas;
+        if (cant < 4){
+		    wait (jug);
+		}else 
+             signal all(jug);
+        total = monto;		 
+	}
+}

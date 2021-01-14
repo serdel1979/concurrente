@@ -1,0 +1,49 @@
+
+type
+tarea = record (int alumno, string tarea);
+var
+boolean resultados[1:40] = ([40], false) 
+sem ready[1:40] = ([40], 0)
+sem res[1:40] = ([40], 0)
+sem Q_mutex = 1
+sem hayTareas = 0
+queue of tarea tareas[1:40]
+
+
+Process alumno [a:1..40]{
+//Espera por que la profesora le de la tarea
+	P(ready[a])
+	while (resultados[a] = false){
+//Realiza la tarea y la encola para correccion
+		//HacerTarea
+		P(Q_mutex)
+		Q_tareas.PUSH(new tarea(a,tarea))
+		V(Q_mutex)
+		V(hayTareas) //Aviso que hay al menos esta tarea en la cola
+//Espera los resultados, si termino puede irse 
+		P(res[a]) //Espero resultados
+	}
+}
+
+Process maestra{
+	tarea tareaActual
+//reparte las tareas
+	for i=1; i<40;i++ {
+		V(ready[i])
+	}
+//revisa las tareas hasta que las 40 esten terminadas
+	int terminadas = 0
+	while (terminadas < 40) {
+		P(hayTareas)
+		P(Q_mutex)
+		Q_tareas.POP(tareaActual)
+		V(Q_mutex)
+		tareaActual.corregir();
+		if tareaActual.esCorrecta(){ 
+			resultados[tareaActual.alumno] = true
+			terminadas ++}
+		else 
+			{tareaActual.comentarErrores()
+			resultados[tareaActual.alumno] = false}
+	}
+}

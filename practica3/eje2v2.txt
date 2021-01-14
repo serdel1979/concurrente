@@ -1,0 +1,39 @@
+Implementar el acceso a una base de datos de solo lectura que puede atender a lo sumo 5 consultas simultáneas.
+
+2.
+
+Monitor database{
+cond proc
+int cantidadEsperando = 0;
+bool bloqueado = false
+
+
+procedure entrar(){
+    
+    if (usuarios == 5){
+        cantidadEsperando++;
+        wait(proc);
+    }
+    else
+        usuarios++;
+}
+
+procedure salir(){
+    if(cantidadEsperando > 0){
+        cantidadEsperando--;
+        signal(proc);
+    }
+    else
+        usuarios--;        
+}
+
+
+}
+
+}
+
+process acceso[i:1..n]{
+	database.entrar();
+	//usa bd
+	database.salir();
+}

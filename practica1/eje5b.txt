@@ -1,0 +1,14 @@
+program eje5b
+  tipo_recurso impresora;
+  queue cola;
+  int sig = -1;
+  
+  process imprime[i:0..n]{
+      int id=-1;
+      <if (sig==-1) sig = i else cola.encolar(i)>
+	  <await (sig == i)>
+	  impresora.imprime()
+	  <if empty(cola) sig = -1 else sig = sig= cola.pop>  
+  }
+ }
+	

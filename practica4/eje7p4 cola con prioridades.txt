@@ -1,0 +1,36 @@
+7. En un banco hay C Clientes que van al banco a pagar, algunas de ellos son clientes
+Habituales y otros Esporádicos. En el banco hay una única caja donde se atiende a los
+clientes dando siempre prioridad a los Clientes Habituales, y entre los de cada categoría
+(Habitual o Esporádico) en el orden de llegada. Nota: suponga que existe una función
+DarCategoría que le indica al cliente de que categoría es (Habitual o Esporádico). 
+
+
+
+chan habituales (int);
+chan esporadicos (int);
+chan atencion[n] (String);
+
+process clientes[i:1..n]{
+	String categoria, atencion;
+	categoria = darCategoria();
+	if (categoria=="habitual")
+		send habituales (int);
+	else
+		send esporadicos (int);
+	recieve atencion[i] (atencion);
+	
+}
+
+
+process cajero(){
+int cliente
+
+     while true{
+		if (not empty(habituales)) =>  recieve habituales (cliente);
+									   send atencion[cliente] ("listo");
+		[] ((empty(habituales))and(not empty(esporadicos()) =>  recieve esporadicos (cliente);
+									   send atencion[cliente] ("listo");	
+		fi;
+		
+     }	
+}

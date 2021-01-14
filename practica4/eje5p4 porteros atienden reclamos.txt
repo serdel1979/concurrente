@@ -1,0 +1,36 @@
+chan pedidoID (int)
+chan reclamos (texto)
+chan pedidos[1..3] (texto)
+
+process personas [i:1..n]{
+	texto reclamo
+	while true{
+		reclamo= generaReclamo()
+		send reclamos (reclamo);
+	}
+}
+
+
+process porteros[1..3]{
+texto rec
+	while true{
+		send pedidoID (i);
+		recieve pedidos[i] (rec);
+		if(rec == 'nada')
+			delay(10minutos);
+	}
+	
+}
+
+process coordinador(){
+int id; texto rec
+ while true{
+	recieve pedidoID (id);
+	if (empty reclamos)
+		send pedidos[id] ("nada");
+	else{
+		recieve reclamos (rec);
+		send pedidos[id] (rec);
+	}	
+ }	
+}

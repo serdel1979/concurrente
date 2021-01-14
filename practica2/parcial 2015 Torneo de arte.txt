@@ -1,0 +1,40 @@
+//Parcial de concurrente 2015 recursantes - 1° Fecha
+//1 - Resolver con SEMÁFOROS la siguiente situación. En un torneo de arte hay P Participantes que realizan una pintura cada uno. 
+//Al terminar dejan la pintura para ser evaluada y luego esperan el resultado, lo imprimen y se retiran. Además existe un Evaluador 
+//que evalúa las pinturas de acuerdo al orden en que las fueron terminando. El Evaluador toma una pintura, la evalúa y le da la nota 
+//al participante correspondiente. Nota: No se puede usar una estructura auxiliar para almacenar las notas de los participantes. 
+//Maximizar la concurrencia.
+
+
+queue c;
+sem mutxCola = 1; enCola = 0; mutxNota = 1; esperaNota[p] = ([p]0);
+int nota;
+
+process participantes[i:1..p]{
+	Type imagen pintura;
+	pintura := realizaLaPintura();
+	p(mutxCola);
+	c.push(pintura,i);
+	v(mutxCola);
+	v(enCola);
+	p(esperaNota[i]);
+	p(mutxNota);
+	print (Nota);
+	v(mutxNota);	
+}
+
+process evaluador(){
+	int id, resultado;
+	Type imagen pintura;
+	
+	while (true){
+		p(enCola);
+		p(mutxCola);
+		c.pop(pintura,id);
+		v(mutxCola);
+		p(mutxNota);
+		nota := evaluar(pintura);
+		v(mutxNota);
+		v(esperaNota[id]);
+	}	
+}

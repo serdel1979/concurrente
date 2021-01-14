@@ -1,0 +1,40 @@
+chan caja[p] (int);
+chan atencion[p] (texto);
+chan cajas[5] (int);
+chan admin (int);
+chan liberar (int);
+chan finAtencion[5] (int);
+
+process clientes[i:1..p]{
+    int caja;
+Texto atencion
+    send admin (i);      
+    recieve caja[i] (caja);  //recibe caja menor
+    send cajas[caja] (i);    //se encola en la caja
+    recieve atencion[i] (atencion);
+    send finAtencion[caja] (i);
+}
+
+process cajas [i:1..5]{
+int cliente;
+while true{
+    recieve cajas[i] (cliente);
+    send atencion[cliente] ("atendido");
+    recieve finAtencion[cliente] (cliente);
+    send liberar (i);
+}
+}
+
+process admin (){
+int contador[5] = ([5]0);
+int menor=0, cliente=0, caja;
+while true {
+    if(not empty(admin)) => recieve admin (cliente);
+                            menor = calculaMenorDe(contador); //devuelve el indice del menor
+                            send caja[cliente] (menor);
+                            contador[menor]++;
+    [] (not empty(liberar)) => recieve liberar (caja);
+                               contador[caja]--;
+    fi
+}    
+}

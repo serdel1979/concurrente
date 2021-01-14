@@ -1,0 +1,31 @@
+program tresEmpleados
+
+process cliente[c:1..N]{
+	buffer!cola(c);
+	empleado?atencion(e);
+	//Recibiendo atencion
+	empleado!fin_atencion();
+}
+
+process buffer(){
+queue cola; int c,e
+	while (true){
+		if ();cliente[*]?cola(c)
+			-> cola.push(c);
+		[] (!empty(cola));empleado[*]?estoy_libre(e)
+			-> cola.pop(c);
+			   empleado[e]!envio_cliente(c);
+		fi;
+	}
+			   
+}
+
+process empleado [e:1..3]{
+int c,e
+	while (true){
+		buffer!estoy_libre(e);
+		buffer?envio_cliente(c);
+		cliente[c]!atencion(e);
+		cliente[c]?fin_atencion();
+	}
+}

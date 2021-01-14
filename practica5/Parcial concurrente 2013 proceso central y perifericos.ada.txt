@@ -1,0 +1,62 @@
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Tareas is
+package Integer_InOut is new Integer_IO(Integer);
+use Integer_InOut;
+
+  task central is
+  end central;
+
+
+  task type periferico is
+      entry setId(id : in Integer);
+      entry operacion(res  : out Integer);
+  end periferico;
+  
+  
+
+
+  
+  task body periferico is
+  idp : Integer;
+  begin
+      accept setId(id : in Integer)do
+         idp := id;
+      end setId;
+      
+      loop
+        accept operacion(res  : out Integer) do
+           res := idp * 2;
+        end operacion;
+      end loop;
+      
+  end periferico;
+  
+perifericos : Array(1..10) of periferico;
+
+
+  task body central is
+  res, p : Integer;
+  begin
+    p := 0;
+    loop
+       --put("Ingresar numero de proceso: ");
+       --get(p);
+       --put(p);
+       p := p + 1;
+       perifericos(p).operacion(res);
+       put(res);
+       if (p = 11)then
+          p := 1;
+       end if;
+    end loop;
+  end central;
+
+
+
+begin
+
+  for i in 1..10 loop
+    perifericos(i).setId(i); 
+  end loop;
+  
+end Tareas;

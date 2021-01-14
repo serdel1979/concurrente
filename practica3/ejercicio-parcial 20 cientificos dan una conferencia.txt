@@ -1,0 +1,41 @@
+
+
+process cientificos[i:1..20]{
+	exposicion.llega();
+	exposicion.pideExponer(i);
+	delay(15');
+	exposicion.termina();	
+}
+
+
+
+monitor exposicion{
+int cant:= 0;
+cond espera, turno;
+bool libre := true;
+
+  procedure llega(){
+	  canta++;
+	  if (cant < 20)
+	      wait(espera);
+	  else signal all (espera); 
+	  cant := 0;
+  }
+
+  procedure pideExponer(){
+	  if (libre)
+		  libre := false;
+	  else{
+		  cant++;
+		  wait (turno);
+	  }
+  }
+
+  procedure termina(){
+	 if (cant > 0){
+		 signal (turno);
+		 cant --;
+	 }else
+        libre:= true;	  
+  }
+}

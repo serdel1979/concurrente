@@ -1,0 +1,43 @@
+task recepcionista;
+task type cliente;
+task type empleado;
+
+task recepcionista is
+	entry hacerReclamo(in reclamo:string, out nreclamo:integer);
+	entry pedirReclamo(out reclamo: string);
+end recepcionista;
+
+task body cliente is
+unReclamo: string; numReclamo: integer
+	loop
+		delay(); 
+		recepcionista.hacerReclamo(unReclamo,numReclamo);
+	end loop;
+end cliente;
+
+task body empleado is
+  unReclamo: string
+	loop
+		recepcionista.pedirReclamo(unReclamo);
+		resolver(unReclamo);
+	end loop;
+end empleado;
+
+task body recepcionista is
+	contReclamos : integer;
+	reclamos : queue of string;
+	contReclamos:=0;
+	loop
+		select
+			when (pedirReclamo'count = 0) => accept hacerReclamo(in reclamo:string, out nreclamo:integer) is
+				contReclamos++;
+				nreclamo:= contReclamos;
+				reclamos.push(reclamo);
+			end hacer_reclamo;
+		or
+			when (not empty(reclamos)) => accept pedirReclamo(out reclamo) is
+				reclamo:= reclamos.pop();
+			end pedirReclamo;
+		end select;
+	end loop;
+end recepcionista;

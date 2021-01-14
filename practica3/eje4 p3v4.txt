@@ -1,0 +1,118 @@
+De Luca, Sergio escribio:
+
+Entonces en el procedimiento atender, cada vez que saque un elemento de la cola hay que preguntar ahí por el estado? 
+Debería usar un while
+
+
+Si, habría que consultar por el estado, y en caso de que aún no se haya ido por el tiempo modificarlo para que el timer lo lo modifique. 
+Por ejemplo, 0 nadie lo despertó, 1 se fué por el timer, 2 es atendido. Entonces tanto el timer como el empleado debe ver que valor tiene 
+y sólo si es 0 lo modifica y despierta al proceso.
+
+Cuando digo que el timer y el monitor se fija el estado, en realidad son procedure del monitor estado, donde hace todo junto: 
+por ejemplo el timer llama al procedure FinTiempo del Estado, y ahí si el estado es 0, lo pone en 1 y despierta al proceso. El monitor adm 
+llamaría al procedure QuieroAtender del Estado: ahí si el estado es 0 lo pone en 2 y despierta a la persona; en este caso si o si retorna como 
+parametro de salida el estado (sea 1 o 2), y en base a esto el monitor adm lo atiende o bueca se fija el siguiente.
+
+ 
+ process clientes[i:1..n]{
+	 int e;
+	 cola.esperar(i,e);
+	 if (estado == 2){
+	     estado[i].consultar();
+	 }	 
+ }
+ 
+ process empleados[i:1..2]{
+  int idc;	
+	while true{
+		 cola.proximo(idc);
+		 estado[idc].atencion();
+	 }	 
+ }
+ 
+ process reloj[i:1..n]{
+	 estado[i].iniciar();
+	 delay(15);
+	 estado[i].finTiempo();
+	 cola.terminoTimer(i);
+ }
+ 
+ monitor estado[i:1..n]{
+ bool habilitado = false; llegoClie = false; llegoEmp=false; atendido = false; finTimer = false;
+ int estado = 0; 
+ cond iniciar; cli; emp; 
+ 
+	 procedure habilitarTimer(){
+		 habilitado = true;
+		 signal (iniciar);
+	 }
+	 
+	 procedure iniciar(){
+		 if (not habilitado) wait (iniciar);
+	 }
+	 
+	 procedure finTiempo(int e : out){
+		 if (not atendido){
+		     estado = 1;
+			 finTimer = true);
+		 }			 
+	 }
+	 
+	 procedure verEstado(int e : out){
+		 e = estado;		 
+	 }
+	 
+	 procedure consultar(){
+		 if (not llegoEmp) wait (cli);
+		 llegoClie = true;
+		 signal (emp);
+	 }
+	 
+	 procedure atender(int e : out){
+		 if (not atendido){
+			atendido = true; 
+			estado = 2;
+		 }	 
+	 }
+	 
+	 procedure atiende(){
+		 if (not llegoClie) wait (emp);
+		 llegoEmp = true;
+		 signal (cli);
+	 }
+	 
+ }
+ 
+ monitor cola{
+	 queue c;
+	 cond clientes[n];
+	 cond emp;
+	 int cantCli = 0;
+	 int estado = -1;
+	 
+	 procedure esperar(int : id in; int : e out){
+		 cantCli ++;
+		 c.push(id);
+		 estado[id].habilitarTimer();
+		 signal (emp);
+		 wait (clientes[id]);
+		 estado[id].verEstado(e);
+	 }
+	 
+	 procedure atender(int idc out){
+		while (estado != 0){
+		    if (cantCli==0) wait (emp);
+		    cantCli--;
+		    idc = c.pop;
+		    estado[idc].verEstado(estado);
+		}
+		estado[idc].atender();
+		signal (clientes[idc]);
+		estado = -1;
+	 }
+	 
+	 procedure terminoTimer(int : id in){
+		 signal (clientes[id]);		 
+	 }
+
+ }

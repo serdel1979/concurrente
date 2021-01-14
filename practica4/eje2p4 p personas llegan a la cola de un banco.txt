@@ -1,0 +1,13 @@
+chan cli (int)
+
+process clientes[c:1..n]{
+	send cli (c);
+}
+
+process empleado[e:1..2]{
+   int empleado
+	while true{
+		recieve cli (empleado);
+		atiende empleado;
+	}
+}

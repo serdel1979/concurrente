@@ -1,0 +1,17 @@
+queue recursos
+sem mutex=1; usarec=5;
+
+process procesos[i:1..n]{
+typerec rec
+while true{
+	p(usarec);
+	p(mutex);
+	rec=recursos.pop();
+	v(mutex);
+	usa rec
+	p(mutex);
+	recursos.push(rec);
+	v(mutex);
+	v(usarec);
+}
+}

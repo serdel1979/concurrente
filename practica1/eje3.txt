@@ -1,0 +1,27 @@
+ProductorConsumidor
+
+int cant=0; 
+int pri_ocupada=0;
+int pri_vacia=0;
+int buffer[N];
+
+Process Productor::{
+  while(true){
+	produce elemento
+	<await (cant<N); cant++>;
+	<buffer[pri_vacia]:= elemento;>
+	<pri_vacia := (pri_vacia + 1)mod N;>
+  }
+}
+
+Process Consumidor::{
+  while (true){
+	<await (cant > 0); cant-->;
+	<elemento := buffer[pri_ocupada];>
+	<pri_ocupada := (pri_ocupada + 1) mod N;>
+	consume elemento  
+  }
+}
+
+a)acceden al bufer sin exclusion mutua. Es necesario agregar las lineas 12 en productor y 20 en consumidor a secc crit
+b) si se tiene n productores y consumidores se agregan las lineas 13 y 21 a la atomicidad

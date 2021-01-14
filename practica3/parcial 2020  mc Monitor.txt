@@ -1,0 +1,54 @@
+process pacientes[i:1..p]{
+	int gravedad;
+	enfermera.revisacion(idmedico,gravedad);
+	sala[idmedico].esperar(i,gravedad);
+	paciente[i].recibeAtencion();	
+}
+
+
+process medico[1..4]{
+	int idp;
+	while (true){
+		sala[i].siguiente(idp);
+		paciente[idp].atender();
+	}	
+}
+
+
+monitor paciente[i:1..p]{
+	bool llegoMedico:= false; llegoPaciente := false;
+	cond pac, med
+	
+	procedure recibeAtencion(){
+		if (not llegoMedico)wait (pac);
+		llegoPaciente := true;
+		signal (med);
+	}
+	
+	procedure atender(){
+		if(not llegoPaciente)wait (med);
+		llegoMedico := true;
+		signal (pac);
+	}
+	
+}
+
+
+
+monitor sala[i:1..4]{
+	queue c;
+	cond pac[p]; med;
+	
+	procedure esperar(int: idp in; int: grav in){
+		insertar-ordenado(c(idp,grav));
+		signal (med);
+		wait (pac[idp]);
+	}
+	
+	procedure siguiente(int : idp out){
+		if (c.empty) wait (med);
+		idp := c.pop();
+        signal (pac[idp]);		
+	}
+	
+}

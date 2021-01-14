@@ -1,0 +1,47 @@
+
+
+int contador_eleccion = 0;
+sem mtx_contador = 1;
+sem eleccion = 0
+sem aviso_cola = 0
+sem [1:10] resultado_listo = ([10]0) ; comenzar[50] = ([50]0);
+int [1:10] orden
+
+Process alumno[a:1..50]
+	int idtarea = elegir()
+	p(mtx_contador);
+	contador_eleccion++;
+	if (contador_eleccion == 50){
+		v(mtx_contador);
+		for(int j = 1;j < 50;j++);
+		    v(comenzar[j]);
+		
+	}else
+	     v(mtx_contador);
+	
+	P(comenzar[i]);
+	realizarTarea()
+	P(mutex_cola)
+	cola.push(idtarea)
+	V(mutex_cola)
+	V(aviso_cola)
+	P(resultado_listo[idtarea])
+	recibirResultado(orden[idtarea])
+
+
+Process profesor
+	int[1:10] contTareas = ([10]0)
+	int terminados = 0
+	int idtarea
+
+	for (i=0,i<50,i++)
+		P(aviso_cola)
+		P(mutex_cola)
+		idtarea = cola.pop()
+		V(mutex_cola)
+		contTareas[idtarea]++
+		if (contTareas[idtarea] == 5)
+			terminados++
+			orden[idtarea] = terminados
+			for (j=0,j<5,j++)
+				V(resultado_listo[idtarea])

@@ -1,0 +1,43 @@
+//PMS
+
+process persona[i:1..n]{
+	char cat;
+	while true{
+		cat:= asignaCategoria();
+		admin!esperar (cat, i);
+		supercomputadora?usar();
+		//usa la supercomputadora
+		supercomputadora!liberar();
+	}	
+}
+
+
+process supercomputadora(){
+	int id;
+	while true{
+		admin!sig();
+		admin?obtener(id);
+		persona[id]!usar();
+		persona[id]?liberar();
+	}	
+}
+
+process admin(){
+	queue a,b,c: int id; char cat;
+	while true{
+		if ()persona[*]?esperar(cat,id)=>{
+										  if (cat=='a')
+											  a.push(id)
+										    else if (cat =='b')
+										           b.push(id)
+											     else if (cat == 'c')
+											            c.push(id);}
+		[](!a.empty())supercomputadora?sig=>{id =a.pop;
+											supercomputadora!obtener(id);}
+	    []((a.empty())and(!b.empty()))supercomputadora?sig(){id= b.pop();
+															supercomputadora!obtener(id)};
+		[]((a.empty)and(b.empty)and(!c.empty))supercomputadora?sig=>{id= c.pop();
+																	supercomputadora!obtener(id)
+		fi
+	}
+}

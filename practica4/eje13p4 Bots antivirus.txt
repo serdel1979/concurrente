@@ -1,0 +1,22 @@
+
+	process robot[r:1..N]{
+		while (true)
+			buscar_sitio_infectado(direccion);
+			buffer!sitios(direccion);
+	};
+
+	process buffer(){
+	queue c; string dir
+		while (true)
+			if ();robot[*]?sitios(dir) -> sitios.push(direccion);
+			[] (!empty(sitios)); analizador?proximo() -> sitios.pop(direccion); analizador!sitio(direccion);
+	}
+
+	procedure analizador(){
+	string dir;
+		while (true){
+			buffer!proximo();
+			buffer?sitio(dir);
+			analizar(dir);
+		}
+	}

@@ -1,0 +1,46 @@
+//corregido
+
+process personas[i:1..p]{
+	int pri;
+	pri := prioridad();
+	equipo.esperar(i,pri);
+	//usa el equipo
+	equipo.liberar();	
+}
+
+
+process coordinador(){
+	while true{
+	   delay(3horas);
+	   equipo.incrementarPrioridad();
+	}
+}
+
+monitor equipo(){
+    bool libre := true;
+	int procesos[p] := ([p]-1); cantDormidos := 0;
+    cond dormidos[p];
+	
+	procedure esperar(int : proceso in; int : prioridad in){
+	  if (not libre){
+          procesos[proceso] := prioridad;
+		  cantDormidos++;
+		  wait (dormidos[proceso]);
+	  }else
+          libre := false;		
+	}
+	
+	procedure liberar(){
+		int ind;
+		ind := calcularMayorPrioridad();
+		signal (dormidos[ind]);	
+		cantDormidos--;
+	    if (cantDormidos!= 0)libre := true;		
+	}
+	
+	procedure incrementarPrioridad(){
+		for (int j=1;j<p;j++)
+			if (procesos[j] != -1)procesos[j]++;
+		
+	}
+}

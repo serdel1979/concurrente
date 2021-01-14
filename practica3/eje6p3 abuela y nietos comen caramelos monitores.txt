@@ -1,0 +1,51 @@
+//corregido 
+
+
+process nietos[i:1..n]{
+	while true{
+	  fuente.tomarCaramelo(i);
+	  //comer el caramelo		
+	}	
+}
+
+process abuela(){
+	int caramelos;
+	while true{
+		caramelos := comprar();
+		fuente.reponer(caramelos);
+	}
+}
+
+
+monitor fuente(){
+int cant:= 0; bool bloqueado:= false;
+cond nietos; primero;	abuela;
+queue enEspera;
+
+procedure tomarCaramelo(int i in){
+  if (cant > 0)and (not bloqueado)
+      cant--;
+    else if (bloqueado)
+              wait (nietos);
+         else{ 	
+           bloqueado := true;  
+	       signal (abuela);
+           wait (primero);
+	       cant --;
+		   signal all(nietos);
+	     }	 
+}
+
+
+procedure reponer(int c in){
+	cant:= c;
+	if (bloqueado){
+	      signal (primero);	
+		  bloqueado := false;
+	}
+	wait (abuela);
+}
+}	
+
+		
+	

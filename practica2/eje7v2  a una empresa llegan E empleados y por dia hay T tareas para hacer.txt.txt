@@ -1,0 +1,50 @@
+7
+A una empresa llegan E empleados y por día hay T tareas para hacer (T>E), una vez que
+todos los empleados llegaron empezaran a trabajar. Mientras haya tareas para hacer los
+empleados tomaran una y la realizarán. Cada empleado puede tardar distinto tiempo en
+realizar cada tarea. Al finalizar el día se le da un premio al empleado que más tareas
+realizó.
+
+
+
+
+sem mutex_tareas = 1; mutx = 1; mutxfin=1; barrera = 0; barrerafin=0; listo = 0
+queue of Tarea tareas
+int cont[1:E] = ([1:E] 0);
+int contadorE = 0;
+int contadorFin = 0;
+
+
+Process empleado[i:1..E]{
+Tarea tareaActual
+
+p(mutx);
+contadorE++;
+if (contadorE == E)
+	for (int i=1 to E){
+		v(barrera);
+	}
+v(mutx);
+p(barrera);
+
+P(mutex_tareas)
+while not tareas.isEmpty(){
+	tareaActual = tareas.pop()
+	V(mutex_tareas)
+	tareaActual.realizar()
+	cont[i]++
+	P(mutex_tareas)
+}
+V(mutex_tareas)
+p(mutxfin);
+contadorFin++;
+if (contadorFin==E)
+	for(int i=1 to E){
+		v(barrerafin);
+	}
+v(mutxfin);
+p(barrerafin);
+printf("El ganador fue ",calcularMaximo(cont));
+}
+
+

@@ -1,0 +1,43 @@
+¿Como podria modelar las prioridades?
+Pienso que cuando los p procesos llegan, le asigno una prioridad, algo asi:
+
+process personas[i:1..p]{
+	int pr;
+	pr:= prioridad();
+	prioridad[i].setear(pr);
+    equipo.esperar(i);	
+	//usar equipo
+	equipo.liberar();
+}
+
+Despues pense un monitor prioridad por cada persona
+
+monitor prioridad[i:1..p]{
+	int prioridad:= 0;
+	
+	procedure setear(int : p in){
+		prioridad := p;
+	}
+	
+	procedure ver(int : p out){
+		p := prioridad;
+	}
+	
+	procedura incrementar(){
+		prioridad++;
+	}
+
+}
+
+y el proceso administrador que cada 3 horas incrementa las prioridades
+
+process administrador(){
+	while true{
+		delay(3hs);
+		for (int i=1; i<p;i++)
+			prioridad[i].incrementar();
+		
+	}
+}
+
+No encuentro el sentido de aumentar las prioridades a todos, por ejemplo si yo tengo a todos esperando en una cola ordenada o un vector, que cambia el hecho de aumentarles la prioridad?

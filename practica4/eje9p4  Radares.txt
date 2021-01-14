@@ -1,0 +1,27 @@
+
+process radar[r:1..10]{
+int dat
+	while (true) {
+		datos := detectar();
+		buffer!datos(dat);
+	}
+}
+
+procedure unidad_de_procesamiento(){
+	while (true){
+		buffer!solicitar_datos();
+		buffer?procesar_datos(datos);
+		procesar(datos); 
+	}
+}
+
+procedure buffer(){
+	queue cola; int dat
+	while (true){
+		if (); radar[*]?datos(datos) --> cola.push(dat);
+		[] (); unidad_de_procesamiento?solicitar_datos() -->
+			cola.pop(dat);
+			unidad_de_procesamiento!procesar_datos(dat);
+		fi;
+	}
+}

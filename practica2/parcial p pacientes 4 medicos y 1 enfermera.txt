@@ -1,0 +1,43 @@
+int prioridades[p];
+queue colaPrioridad;
+queue colaEnfermera;
+sem mtxce = 1; mtxpri = 1; encolaPri = 0; encolaE = 0; esperaPri[P] = ([p]0); atencion[p] = ([p]0);
+
+process pacientes[i:1..p]{
+	int pr;
+	p(mtxce);
+	colaEnfermera.push(i);
+	v(mtxce);
+	v(encolaE);
+	p(esperaPri[i]);
+	pr = prioridades[i];
+	p(mtxpri);
+	colaPrioridad.insertarPorOrden(i,pr);
+	v(mtxpri);
+	v(encolaPri);
+	p(atencion[i]);	
+}
+
+process enfermera(){
+	int id;
+	while true{
+		p(encolaE);
+		p(mtxce);
+		id = colaEnfermera.pop();
+		v(mtxce);
+		priodidades[id] = determinaPrioridad();
+		v(esperaPri[id]);
+	}	
+}
+
+process medicos[i:1..4]{
+int id;
+while true{	
+	p(encolaPri);
+	p(mtxpri);
+	id = colaPrioridad.pop();
+	v(mtxpri);
+	//atiende al paciente id
+	v(atencion[id]);
+}
+}

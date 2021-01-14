@@ -1,0 +1,57 @@
+
+ 
+9. Hay N vehículos (cada uno tiene su propio peso) que deben pasar por un puente de acuerdo
+al orden de llegada, pero el puente no soporta más de 50000kg. Nota: maximizar
+concurrencia. Suponga que ningún vehículo supera el peso soportado por el puente.
+ 
+
+
+
+
+
+
+
+	   
+	   
+
+
+process vehiculos[i:1..n]{
+	type vehiculo=record
+       int id
+       int peso
+	
+	vehiculo v.id=1; v.peso = obtenerPeso();
+	puente.llegar(v);
+	puente.pasar();	
+}
+
+monitor puente(){
+	int pesototal=0; enespera=0;
+	cond vehiculo;
+	queue turno;
+	bool puedepasar=false;
+	
+	procedure llegar(vehiculo v in){
+		while(v.peso + pesototal> 50000){
+			wait(vehiculo);
+		}
+		pesototal = pesototal + v.peso;
+		turno.push(v);
+		enespera++;
+	}
+	
+	procedure pasar(){
+		vehiculo v;
+		if(  enespera > 0){
+		   v = turno.pop();
+		   pesototal = pesototal - v.peso;
+		   enespera --;
+		}else{
+			signal(vehiculo);
+		}
+		
+	}
+	
+	
+	
+}

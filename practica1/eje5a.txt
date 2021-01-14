@@ -1,0 +1,10 @@
+program 5a  //sin orden
+
+
+
+Process trabajo[i:1..n]{
+
+	<impresora.imprimir(documento)>
+	
+}
+

@@ -1,0 +1,11 @@
+tipo_recurso impresora;
+sem mutex=1;
+
+process persona[i:1..n]{
+
+	p(mutex);
+	impresora.imprimir();
+	v(mutex);
+
+}
+

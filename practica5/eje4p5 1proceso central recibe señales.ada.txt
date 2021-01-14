@@ -1,0 +1,94 @@
+--Los dos tipos de procesos deberian enviar datos. Y el ok, no debe devolverselo la central, si continuas en 
+--la siguiente linea al entry call, es que tuviste el accept, y ahi manejas el booleano localmente.
+
+
+
+
+
+task  central;
+task  proceso1;
+task  proceso2;
+task timer;
+
+
+task timer is
+	entry iniciar();	
+end timer;
+
+task body timer is;
+   while true loop
+     accept iniciar();
+     delay (180);
+     central.finTimer();
+   end loop;
+end timer;
+
+
+task central is
+	entry signal1(s: string in);
+	entry signal2(s: string in);
+	entry fintimer();
+end central;
+
+task body proceso1 is
+string: señal;
+begin
+	while true loop
+	    señal:= generaseñal();
+		select
+			central.signal1(señal);
+		or delay (120)
+			null 
+		end select;
+	end loop;
+end proceso1;
+
+
+
+
+
+task body proceso2 is
+string: senal; boolean: ok:=false;
+begin
+    while true loop
+        senal:= generarSenal();
+		while (not ok) begin		  
+          select
+              central.signal2(senal);
+              ok:= true;
+          or delay (60)
+              null
+          end select;
+		end loop
+    end loop;
+end proceso2;
+
+
+
+task body central is
+bool: fin:= false; string: senal;
+begin
+    accept signal1(s: string in)do
+	  senal:= s;
+	end signal1;
+    loop
+		select 
+ 		      accept signal2 (s: string in) do	 
+			    senal:= s;
+			  end signal2;
+			   timer.iniciar();
+			   while (not fin) loop
+			      select case
+					   when (finTimer'count = 0) => accept signal2(s: string in) do	 
+													   senal:= s;
+													end signal2;;
+					or
+					   accept finTimer;		
+					      fin:= true;
+			      end select;
+			   end loop;
+		or 
+		   accept signal1(s: string in)do end signal1;
+		end select;
+	end loop;
+end central;

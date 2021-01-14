@@ -1,0 +1,12 @@
+Procedure FormarFila (num: OUT integer){
+
+      cant++;
+
+      if (cant < 50) wait(al)
+
+      else signal_all(al);
+
+      num = darNumeroGrupo();
+
+}	
+	

@@ -1,0 +1,24 @@
+task type cliente;
+task empleado;
+
+task empleado is
+	entry pedirAtencion();
+
+end empleado;
+
+task body cliente is
+	select 
+		empleado.pedirAtencion();
+
+	OR
+		DELAY (600);
+	end select;
+end cliente;
+
+task body empleado is
+	loop
+		accept pedirAtencion();
+	end loop;
+end empleado;
+
+clientes array(1..N) of cliente;

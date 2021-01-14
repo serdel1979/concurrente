@@ -1,0 +1,60 @@
+chan pedidoC(int), pedidoN(int), pedidoNC (int), devoC(int), devoN(int), devoNC(int)
+array of chan colores[c] (int)
+array of chan negros[n] (int)
+array of chan nc[a] (int)
+
+process niñosC[i:1..c]{
+int lapiz
+while true{
+	send pedidoC (i);
+	recieve colores[i] (lapiz)
+	delay(600);
+	send devoC (lapiz);
+}
+}
+
+process niñosN[i:1..n]{
+int lapiz
+while true{
+	send pedidoN (i);
+	recieve negros[i] (lapiz)
+	delay(600);
+	send devoN (lapiz);
+}
+}
+
+process niñosNC[i:1..a]{
+int lapiz
+while true{
+	send pedidoNC(i);
+	recieve nc[i] (lapiz)
+	delay(600);
+	send devoNC (lapiz);
+}
+}
+
+process abuela(){
+int cantC=15, cantN=10, idc,idn, idnc;
+ while true{
+	if  (cantC>0)->{
+		recieve pedidoC (idc);
+		cantC=cantC-1;
+		send colores[idc] (cantC)};
+	[]  ((!empty(pedidoN))and(cantN>0))->{
+		recieve pedidoN (idn)
+		cantN=cantN-1;
+		send negros[idn] (cantN)};
+	[]  (!empty(pedidoNC))and((cantN>0) or (cantC >0))->{	
+		    recieve pedidoNC (idnc);
+		    if
+		      [](cantN > cantC)->{cantN=cantN-1; send nc[idnc] (cantN)};
+		      [](cantC > cantN)->{cantC=cantC-1; send nc[idnc] (cantC)};
+		    fi;	
+	}
+	[]  (not empty(deovoC))->{recieve devoC (idc);  cantc = cantc +1};
+	[]  (not empty(devoN)) ->{recieve devoN (idn);	cantN = cantn +1};
+	[]  (not empty(devoNC)) ->{recieve devoNc (idn);	cantN = cantn +1};
+	fi;
+ }
+}
+

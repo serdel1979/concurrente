@@ -1,0 +1,99 @@
+5. Se tiene una oficina de registros que atiende un único empleado, existen C clientes que cuando
+llegan se encolan para ser atendidos por el empleado, mientras esperan para ser atendidos
+toman una planilla y la llenan para ganar tiempo, luego que completaron la planilla esperan a
+que los llame el empleado, al momento de la atención el cliente le da la planilla al empleado,
+este carga los datos y le entrega un comprobante de registro.  
+
+
+
+
+
+
+
+
+
+process clientes[i:1..c]{
+  text planilla, comprobande
+  planilla = llenaPlanilla()
+  oficina.llegar(i);
+  tramite[i].entregaPlanilla(planilla)
+  tramite[i].recibeComprobante(comprobande)
+}
+
+process empleado{
+  text planilla, comprobante
+  int id
+  while (true){
+    oficina.atender(id);
+	tramite[id].esperarPlanilla(planilla);
+	comprobante = generarComprobante(planilla);
+	tramite[id].entregar(comprobante);
+  }
+}
+
+
+
+monitor oficina{
+  cond cliente, emp;
+  int cantcli=0;
+  queue clientes
+  boolean empleadolibre=true
+
+  procedure llegar(int in id ){
+	  if(not empleadolibre){
+		  cantcli++;
+		  clientes.push(id);
+	      wait(cliente);
+	  }
+	  else
+		  signal(emp);
+  }
+  
+  procedure atender(int out id){
+	if (cantcli>0){
+	  empleadolibre = false; 
+	}else{
+		empleadolibre = true;
+		wait(emp)
+	}
+	cantcli--;
+	id = clientes.pop()
+	signal(cliente);
+  }
+}
+
+
+
+
+
+
+
+ 
+monitor tramite[i:1..c]{
+ text planilla, comp;
+ cond aviso, reibe;
+ boolean ok=false; okplani=false;
+ 
+ procedure entregaPlanilla(text plani in){
+     planilla = plani;
+	 okplani = true;
+	 signal(aviso);
+   }
+
+   procedure esperaPlanilla(text plani out){
+	  if (not okplani) wait(aviso);
+	  plani = planilla;
+   }	   
+   
+   procedure entregaComprobante(text comprobante in){
+	   comp = comprobante;
+	   ok = true;
+	   sign(recibe);
+   }
+   
+   procedure recibeComprobante(text comprobante out){
+	    if (not ok) wait(recibe);
+		comprobante = comp;	
+   }
+
+}

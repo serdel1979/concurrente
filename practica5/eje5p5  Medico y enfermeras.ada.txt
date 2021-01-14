@@ -1,0 +1,87 @@
+task type persona;
+task type enfermera;
+task medico;
+task consultorio;
+
+task medico is
+	entry atenderPersona();
+	entry atenderEnfermera();
+end medico;
+
+task consultorio is
+	entry dejarNota(in nota:string);
+	entry tomarNota(out nota:string);
+end consultorio;
+
+
+
+
+
+
+task body persona is
+boolean: fin; integer: intentos;
+begin
+  fin:= false;
+  intentos:= 1;
+  while (intentos < 3) and (not fin) loop
+		select
+			medico.atenderPersona();
+			fin:= true;
+		or delay ( 5 );
+			delay (10)
+			intentos ++;
+		end select	
+  end loop;
+end persona;
+
+
+
+task body enfermera is
+	loop
+		delay();
+		select
+			medico.atenderEnfermera();
+		else
+			escribirNota(nota);
+			consultorio.tomarNnota(nota);
+		end select;
+	end loop;
+end enfermera;
+
+task body consultorio is
+	notas : queue;
+	new(notas);
+	loop
+		select
+			when ( !empty(notas) ) => accept tomarNnota(nota) is
+				notas.pop(nota);
+			end tomarNota;
+		or	accept dejarNota(nota) is
+			notas.push(nota);
+			end dejarNota;
+		end select;
+	end loop;
+end consultorio;
+
+
+
+
+task body medico is
+	loop
+		select
+			accept atenderPersona() is
+				delay();
+			end atenderPersona;
+		or when ( atenderPersona'count = 0) =>
+			accept atenderEnfermera() is
+				delay();
+			end atenderEnfermera;
+		else
+			select
+				consultorio.tomarNota(nota);
+			else
+				null;
+			end select;
+		end select;
+	end loop;
+end medico;

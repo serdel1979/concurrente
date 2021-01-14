@@ -1,0 +1,44 @@
+
+
+
+	procedure buffer_muestras(){
+	queue almacen, adn muestra;
+		while (true){
+			if ();veterinarioA?guardar(muestra) -> almacen.push(muestra);
+			[] (not empty(almacen)); veterinarioB?pedir_muestra() 
+				-> almacen.pop(muestra);
+				   veterinarioB!muestra(muestra);
+			fi;
+		}
+	}
+
+
+	process veterinarioA(){
+	adn muestra
+		while (true){
+			preparar(muestra);
+			buffer_muestras!guardar(muestra);
+		}
+	}
+
+
+	process veterinarioB(){
+		while (true){
+			buffer_muestras!pedir_muestra();
+			buffer_muestras?muestra(muestra);
+			set_analisis := armar_set_de_analisis(muestra);
+			veterinarioC!analizar(set_analisis);
+			veterinarioC?resultados(resultados);
+			archivar(resultados);
+		}
+			
+	}
+
+	process veterinarioC(){
+	text resultados
+		while (true){
+			veterinarioB?analizar(set_analisis);
+			resultados := realizar_analisis(set_analisis);
+			veterinarioB!resultados(resultados);
+		}
+	}

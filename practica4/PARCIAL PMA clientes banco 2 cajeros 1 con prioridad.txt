@@ -1,0 +1,62 @@
+//PMA parcial 29/11/2010
+//n clientes llegan al banco, pueden hacer tramite o consulta
+//hay 1 empleado que atiende y 1 jefe. el jefe puede atender a los 2 pero le da prioridad a tramites
+//el empleado solo puede atender consultas
+
+chan atencion[n] (texto);
+chan consultas (int);
+chan tramites (int);
+chan siguiente (texto);
+chan jefe (int);
+chan emp (int);
+
+
+process cliente[i:1..n]{
+	Texto: tipo, atencion, despedir;
+	tipo = determinarTipo();
+	if (tipo == "consulta") send consultas (i);
+	else send tramites (i);
+	recieve atencion[i] (atncion);
+}
+
+
+process coordinador(){
+	Texto: sig; int id;
+	while true{
+		recieve siguiente (sig);
+		if
+			[]((sig == "jefe")and(!empty(tramites))recieve tramites (id)=> send jefe (id);
+			[]((sig == "jefe")and(empty(tramites))and(!empty(consultas)) recieve consultas (id) => send jefe (id);
+			[]((sig == "empleado")and(!empty(consultas)) recieve consultas (id) => send empleado (id);
+		if
+	}
+}
+
+process jefe(){
+int id;
+while true{
+	send siguiente ("jefe");
+	recieve jefe (id);
+	send atencion[id] ("chau");	
+}
+}
+
+process empleado(){
+int id;
+while true{
+	send siguiente ("empleado");
+	recieve empleado (id);
+	send atencion[id] ("chau");	
+}
+}
+
+
+
+
+
+
+
+
+	
+	
+	

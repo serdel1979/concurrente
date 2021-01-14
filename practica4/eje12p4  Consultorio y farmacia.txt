@@ -1,0 +1,48 @@
+
+
+procedure pacientes[i:1..n]{
+string receta, medicamentos
+	cola!esperar(i);
+	medico?atender(receta);
+
+	coladefarmacia!esperar(i);
+	farmacia?atender();
+	farmacia!entregareceta(receta);
+	farmacia?medicamentos(medicamentos);	
+}
+
+process cola(){
+queue q, int idp
+	while (true)
+		if ();paciente[*]?esperar(idp) -> q.push(idp);
+		[] (!empty(q)); medico?libre() -> q.pop(idp);medico!paciente(idp);
+}
+
+process coladefarmacia(){
+queue q; int idp
+	while (true)
+		if ();paciente[*]?esperar(idp) -> q.push(idp);
+		[] (!empty(q)); farmacia?libre() -> q.pop(idp);farmacia!proximo(idp);
+}
+
+process medico(){
+int idp; string receta
+	while (true){
+		cola!libre();
+		cola?paciente(idp);
+		hacer_receta(receta);
+		cliente[idp]!atender(receta);
+    }
+}
+
+procedure farmacia(){
+int idp; string receta, medicamentos
+	while (true){
+		coladefarmacia!libre();
+		coladefarmacia?proximo(idp);
+		paciente[idp]!atender();
+		paciente[idp]?entregareceta(receta);
+		preparar_medicamentos(receta,medicamentos);
+		paciente[c]!medicamentos(medicamentos);
+	}
+}

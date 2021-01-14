@@ -1,0 +1,70 @@
+
+
+//3. Monitores
+//Una empresa tiene 40 trabajadores y 4 combis.
+//Cada trabajador conoce su equipo y cada equipo tiene su combi
+//Los trabajadores suben a la combi de su equipo
+//Cuando las 4 combi estan listas inician el viaje hacia diferentes plantas
+//El viaje dura diferente tiempo para cada combi (entre 15 y 20 minutos)
+//Apenas llega la combi a su planta los trabajadores bajan y comienzan a trabajar.
+//Los empleados se retiran por separado apenas terminan su tarea
+
+procedure persona[i:1..40]{
+	equipo := obtenerEquipo(i);
+	combi[equipo].subir();
+	//trabajan y se van
+
+}
+
+
+process combis[i:1..4]{
+	combi[i].arrancar();
+	delay(15 - 20 min);
+	combi[i].llegar();	
+}
+
+
+
+monitor combi[i:1..4]
+int cant ; bool listo:= false;
+cond esp, arr;
+
+	process subir(){
+		cant++;
+		if (cant < 10) then
+			wait(esp)
+		else{
+			contador.incrementar();
+			signal (arr);
+			listo := true;
+		}
+		
+	}
+	
+	
+	procedure arrancar(){
+		if (not listo) wait (arr);
+	}
+	
+	
+	process llegar(){
+		signal all(esp);
+	}
+}
+
+monitor contador{
+	cond esp;
+	cont := 0;
+
+	procedure incrementar(){
+		cont++
+		if (cont < 4) then
+			wait(esp)
+		else
+			signal all(esp);
+	}
+}
+
+
+
+

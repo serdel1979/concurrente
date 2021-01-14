@@ -1,0 +1,27 @@
+task type controlador;
+task central;
+
+task central is
+	entry analizar(in t:integer,out r: string);
+end central;
+
+task body central is
+	loop
+		accept analizar(in : integer; out r: string) is
+			if (t >= 40) then r := 'Detener'
+			else r:='Seguir';
+		end analizar;
+	end loop;
+end central;
+
+task body controlador is
+  t:integer;
+  r:string;
+	loop
+		tomarTemperatura(t);
+		central.analizar(t,r);
+		if (r = 'Detener') then delay(60);
+		else 
+		   delay(10);
+	end loop;
+end controlador;

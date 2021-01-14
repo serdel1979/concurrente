@@ -1,0 +1,61 @@
+process cientificos[i:1..20]{
+	exposicion.llega(i);
+	expo[i].exponer();
+	delay(15');
+	expo[i].terminar();	
+}
+
+process admin(){
+	int id;
+	for (int i = 1;i < 20; i++){;
+	  exposicion.proximo(id);
+	  expo[id].turno();
+	  expo[id].esperaFin();
+	}
+}
+
+monitor exposicion{
+queue c;
+int cant:=0;
+bool todos:=false;
+cond espera, prof;	
+	
+	procedure llega(int id in){
+		cant++;
+		c.push(id);
+		if (cant < 20)wait (espera);
+		else{
+			signal all(espera);
+			signal (prof);
+			todos := true;			
+		}		
+	}
+	
+	procedure proximo(int id out){
+		if (not todos)wait(prof);
+		id := c.pop(();		
+	}
+}
+
+monitor expo[i:1..20]{
+cond expone, fin;	
+bool llegaTurno:= false; finExpo := false;	
+	
+	procedure expone(){
+		if (not llegoTurno) wait (expone);	
+	}
+	
+	procedure turno(){
+		llegaTurno := true;
+		signal (expone);
+	}
+	
+	procedure terminar(){
+		finExpo := true;
+		signal(fin);
+	}
+	
+	procedure esperaFin(){
+		if (not finExpo) wait(fin);
+	}
+}

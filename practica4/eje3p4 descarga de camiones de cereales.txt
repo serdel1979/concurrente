@@ -1,0 +1,13 @@
+chan descarga (int)
+
+process camiones[c:1..n]{
+	send descarga (c);
+}
+
+process acopiadora{
+   int ca
+	while true{
+		recieve descarga (ca);
+		acopia(ca);
+	}
+}

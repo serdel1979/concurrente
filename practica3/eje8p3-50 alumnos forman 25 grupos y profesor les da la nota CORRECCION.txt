@@ -1,0 +1,117 @@
+El JTP podría ser el monitor, donde se hace una barrera para que todos lleguen (con una cola para mantener el orden) y al 
+llegar el último le asigna a cada uno el número de grupo, que se lo informa como parámetro de salida.
+Cuando uno termina le avisa a ese mismo monitor.
+Fijate de hacerlo de esa manera. Yo después miro el que mandaste ahora, pero tiene una estructura (de procesos y monitores) 
+muy compleja para este ejercicio.
+
+
+
+
+
+process alumnos[i:1..50]{
+	int g, nota; Texto tarea;
+	fila.formarFila(i);             //forma la fila (se guarda en una cola)
+	alumno[i].obtenerGrupo(g);      //espera el numero de grupo
+	tarea:= hacerTarea();	        //hace la tarea
+	grupo[g].entregar(i,tarea);     //guarda la tarea en el monitor del grupo correspondiente
+	
+	alumno[i].esperarNota(nota);	//espera que el profesor le entrege la nota
+}
+
+process jtp(){			
+int g, id;
+
+for (int j:=25; j > 1; j--){
+	profesor.proximaTarea(tarea,id1,id2);		//espera que un grupo entregue
+    alumno[id1].calificar(j);					//le entrega la nota a cada alumno del grupo
+	alumno[id2].calificar(j);
+}
+}
+
+monitor grupo[i:1..25]{
+Texto tarea; 	
+int alumno[2]; indice := 1;
+bool listo := false;
+
+ 
+  procedure entregar(int id: in ; texto t in){  			//cada grupo tiene un monitor donde se espera que los alumnos dejen su tarea
+	if (indice < 3){										//cada grupo guarda la tarea de cada alumno y sus id
+       alumno[indice] := id;
+	   tarea := tarea + t;
+	   indice++;
+	}	
+    if (indice == 3){
+       profesor.entregar(alumno[1],alumno[2],tarea);    //cuando los dos alumnos del grupo entregaron, se lo manda al monitor del profesor
+	}		
+  }
+  		
+}
+
+
+monitor profesor(){
+	texto tarea;
+	int alumno1,alumno2,grupo; cant:= 0;
+	queue c;
+	cond prof;
+	
+	procedure entregar(int : a1,a2 in; texto t){          //cada grupo guarda la tarea terminada llamando a entregar del monitor profesor
+		c.push(a1,a2,t);
+		cant++;
+		signal (prof);
+	}
+	
+	procedure proximaTarea(texto : tarea out; int : al1,al2 out){
+       if (cant==0) wait(prof);
+	   c.pop(tarea,al1,al2);                              //el profesor toma la proxima tarea terminada junto con los id de los alumnos
+	   cant--;
+	}		
+	
+}
+
+monitor alumno[i:1..50]{    //el monitor de cada alumno para recibir la nota y el numero de grupo
+	int ngr, nota; bool  hayNota:= false; llegoProfesor := false; llegoAlumno := false;
+	cond al, prof, not;
+	
+	procedure obtenerGrupo(int g out){
+		if (not llegoProfesor) wait (al);
+		g := ngr;
+	}
+	
+	procedre entregarNumeroGrupo(int n in){
+		ngr := n;
+	    llegoProfesor := true;
+		signal (al);
+
+	}
+    
+	procedure esperarNota(int n out){
+		if (not hayNota) wait (not);
+		n:= nota;
+	}
+	
+    procedure calificar(int n in){
+	   nota := n;
+	   hayNota := true;
+	   signal(not);
+    }	
+}
+
+
+
+monitor fila(){
+int cant:= 0;
+cond al;
+
+procedure formarFila (num: OUT integer){
+      cant++;
+      if (cant < 50) wait(al)
+      else signal_all(al);
+      num = darNumeroGrupo();
+}
+
+}
+	
+	
+}
+		
+	

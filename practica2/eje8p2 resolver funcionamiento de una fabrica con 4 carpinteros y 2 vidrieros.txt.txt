@@ -1,0 +1,54 @@
+9. Resolver con SEMÁFOROS el funcionamiento en una fábrica de ventanas con 7
+ empleados (4 carpinteros, 1 vidriero y 2 armadores) que trabajan de la 
+siguiente manera: • Los carpinteros continuamente hacen marcos (cada marco es 
+armando por un único carpintero) y los deja en un depósito con capacidad de 
+almacenar 30 marcos. • El vidriero continuamente hace vidrios y los deja en 
+otro depósito con capacidad para 50 vidrios. • Los armador continuamente toman
+ un marco y un vidrio de los depósitos correspondientes y arman la ventana 
+(cada ventana es armada por un único armador). 
+
+sem mutex_deposito_marcos = 1
+sem barrera_deposito_marcos = 30
+sem mutex_deposito_vidrios = 1
+sem barrera_deposito_vidrios = 50
+sem aviso_marco = 0
+sem aviso_vidrio = 0
+
+
+Process carpintero[c:1..4]{
+while true{
+	//armar marco
+	P(barrera_deposito_marcos)
+	P(mutex_deposito_marcos)
+	//colocar un marco en el deposito
+	V(mutex_deposito_marcos)
+	V(aviso_marco)	
+    }
+}
+	
+Process vidriero(){
+while true{
+	//armar vidrio
+	P(barrera_deposito_vidrios)
+	P(mutex_deposito_vidrios)
+	//colocar un vidrio en el deposito
+	V(mutex_deposito_vidrios)
+	V(aviso_vidrio)
+    }
+}
+Process armador[a:1..2]{
+while true{
+	P(aviso_marco)
+	P(aviso_vidrio)
+	P(mutex_deposito_marcos)
+	//Retirar un marco del deposito
+	V(mutex_deposito_marcos)
+	V(barrera_deposito_marcos)
+	P(mutex_deposito_vidrios)
+	//Retirar un vidrio del deposito
+	V(mutex_deposito_vidrios)
+	V(barrera_deposito_vidrios)
+	//Elaborar ventana
+    }
+}
+

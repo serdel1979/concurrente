@@ -1,0 +1,30 @@
+sem mutex=1, mutxc=1; esperaQueue = 0;
+Array of sem turno[n]=([n]=0);
+trecurso impresora;
+
+process imprimir[i:1..n]{
+
+  p(mutex);
+  cola.encolar(i);   
+  v(esperaQueue);    
+  v(mutex);
+  p(turno[i]);   
+  p(mutxc);
+  impresora.imprimir();  
+  v(mutxc);
+
+} 
+
+process coordinador(){
+
+while(true){
+
+  p(esperaQueue);      //espera que haya algo en la cola
+  p(mutex);
+  id=cola.desencolar();  //desencola el proximo que va a imprimir
+  v(mutex);
+  v(turno[id]);			 // avisa que ya puede imprimir
+  
+}
+
+}

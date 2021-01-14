@@ -1,0 +1,82 @@
+-- Esto es un comentario!
+----- ada no tiene bloques de comentarios -_- ----
+
+--PesoPuente = 5
+--Autos = 1
+--Camioneta = 2
+--Camion = 3
+--Hay A,B,C autos, camionetas y camiones
+
+--a) Todos los vehiculos tienen la misma prioridad
+--b) Modificar para que los camiones tengan mayor prioridad
+
+
+
+TASK TYPE Auto;
+TASK TYPE Camioneta;
+Task Type Camiones;
+
+
+Task Puente IS
+	entry entraAuto();
+	entry saleAuto();
+	entry entraCamioneta();
+	entry saleCamioneta();
+	entry entraCamion();
+	entry saleCamion();
+end Puente;
+
+Task body Auto IS
+  puente.entraAuto();
+  puente.saleAuto();
+end Auto;
+
+Task body Camioneta IS
+	puente.entraCamioneta();
+	puente.saleCamioneta();
+end Camioneta;
+
+Task body Camiones IS
+	puente.entraCamion();
+	puente.saleCamion();
+end Camiones;
+
+Task body Puente IS
+	peso : Integer;
+begin
+	peso:=0;
+	loop 
+		select
+			when (entraCamion’count = 0)AND(( peso <= 4 ) => accept entraAuto() IS
+				peso := peso +1;
+			end entraAuto;
+			
+			OR
+			when (entraCamion’count = 0)AND( peso <= 3 ) => accept entraCamioneta() IS
+				peso := peso +2; 
+			end entraCamioneta;
+			
+			OR
+			when ( peso <= 2 ) => accept entraCamion() IS
+				peso := peso +3; 
+			end entraCamion;
+			
+			OR
+			accept saleCamion() IS
+				peso := peso - 3;
+			end saleCamion;
+			
+			OR
+			accept saleCamioneta() IS
+				peso := peso - 2;
+			end saleCamioneta;
+			
+			OR
+			accept saleAuto() IS
+				peso := peso - 1;
+			end saleAuto;		
+				
+		end select;
+	end loop;
+		
+end Puente;

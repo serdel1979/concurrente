@@ -1,0 +1,16 @@
+eje2
+sem detector:= 1
+Process persona [i:1..N]{
+P(detector)
+//SC
+V(detector)
+}
+
+
+eje2b
+sem detector=3;
+process personas [i:1..N]{
+P(detector)
+//SC
+V(detector)
+}

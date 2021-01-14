@@ -1,0 +1,49 @@
+
+sem mutex=1; encola = 0;
+array of sem inicio[n] = ([n]: 0);
+array of sem mutx-estado[n] = ([n]: 1);
+array of sem avisa[n] = ([n]: 0);
+array of string estado[n] = ([n]: "");
+queue cola;
+
+process clientes[i:1..n]{	
+    p(mutex-estado[i]);
+	estado[i] = "Esperando";
+	v(mutex-estado[i]);
+	p(mutex);
+	cola.push(i);
+	v(mutex);
+	v(inicio[i]);
+	v(encola);
+	p(avisa[i]);	
+	printf ("se retira ", estado[i]);
+}
+
+process tiempo[t:1..n]{
+    p(inicio[t]);
+	delay(10');
+	p(mutex-estado[j]);
+	if (estado[t]=="Esperando"){
+		estado[t]= "sin ser atendido";
+	    v(avisa[t]);
+	}
+	v(mutex-estado[j]);	
+
+}
+
+process empleado(){
+	int id=-1;
+	while true{
+		p(encola);	
+		p(mutex);
+		id = cola.pop();
+		v(mutex);
+		p(mutex-estado[id]);
+		if (estado[id]=="Esperando"){
+			estado[id] = " siendo atendido";
+			v(avisa[id]);
+		}
+		v(mutex-estado[id]);
+		
+	}	
+}

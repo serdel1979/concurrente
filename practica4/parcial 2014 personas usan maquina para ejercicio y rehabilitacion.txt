@@ -1,0 +1,52 @@
+Parcial de Concurrente 2014 – 1ra Fecha
+2 - Resolver con PMA el siguiente problema. En un gimnasio hay tres máquinas iguales que pueden ser utilizadas para hacer 
+ejercicio o rehabilitación. Hay E personas que quieren usar cualquiera de esas máquinas para hacer ejercicio, y R personas 
+que las quieren usar para hacer rehabilitación. Siempre tienen prioridad aquellas que la quieran usar para realizar rehabilitación. 
+Cuando una persona toma una máquina la usa por 10 minutos y se retira.
+
+chan rehabi (int);
+chan ejercicio (int);
+chan pejer[1..e] (int);
+chan preha[1..r] (int);
+chan maquina[1..3] (texto);
+chan libre (int);
+
+process personasEjercicio[i:1..e]{
+int idm;	
+	send ejercicio (i);
+	recieve pejer[i] (idm);
+	delay(10minutos);
+	send maquina[idm] ("listo");
+	
+}
+
+process personasRehabilitacion[i:1..r]{
+int idm;
+	send rehabi (i);
+	recieve preha[i] (idm);
+	delay(10minutos);
+	send maquina[idm] ("listo");
+	
+}
+
+process maquina[i:1..3]{
+	texto txt;
+	while true{
+		send libre (i);
+		recieve maquina[i] (txt);		
+	}
+}
+
+
+
+process admin(){
+	int idm, idp;
+	do
+	  [](not empty(libre))and(empty(rehabi))and(not empty( ejercicio))=>recieve libre (idm);
+																		recieve ejercicio (idp);
+																		send pejer[idp] (idm);
+	  [](not empty(libre))and(not empty(rehabi)) => recieve libre (idm);
+													recieve rehabi (idp);
+													send preha[idm] (idp);
+	od	
+}

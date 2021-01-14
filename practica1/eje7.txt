@@ -1,0 +1,23 @@
+program eje7
+bool libre=false;
+queue cola;
+array of boolean vec[n] = ([n],false);
+
+process sc[i:1..0]{
+while true do{
+  <cola.encolar(i)>
+  while (!vec[i])skip;
+    //us SC
+  libre = true;
+}
+
+  process coordinador{
+  int id=-1;
+  while true{
+    while(cola.empty())skip;
+    <id=cola.desencolar()>;
+    vec[id]=true;
+    while(!libre)skip;
+  }
+}
+}

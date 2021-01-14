@@ -1,0 +1,65 @@
+
+//corregido
+
+process paciente[i:1..n]{
+	int med; j; 
+	med := elegirMedico();
+	if (med == 3){
+		for (j=1; j < 2; j++)
+			salaDeEspera[j].esperar(i);		
+		
+	}else{
+		salaDeEspera[med].esperar(i);	
+	}
+	atencion[i].recibeAtencion();
+}
+
+
+process medico [i:1..2]{
+	int idp; 
+	while true{
+	   	salaDeEspera[i].proximo(idp);
+	    atencion[idp].atender(); 
+	}
+}
+
+
+monitor atencion[i:1..n]{
+	boolean atendido:= false; llegoMedico:= false; llegoPaciente := false;
+	cond medico, paciente;
+	
+	procedure recibeAtencion(){
+		llegoPaciente := true;
+		if (llegoMedico)
+		    signal(medico);
+		else
+		   wait(paciente);	
+	}
+	
+	procedure atender(){
+		if (not atendido){
+		   llegoMedico := true;
+		   atendido := true;
+ 		   if (llegoPaciente)
+			   signal(paciente);
+		   else
+			   wait (medico); 
+		}
+	}
+}
+
+
+monitor salaDeEspera[i:1..2]{
+queue c; 
+cond medico, paciente;
+
+   procedure esperar(id : int in){
+	   c.push(id);
+	   signal(medico);	 	   
+   }
+   
+   procedure proximo(id : int out){
+	   if (c.empty()) wait (medico);
+	   id := c.pop();
+   }	
+}

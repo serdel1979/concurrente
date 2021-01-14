@@ -1,0 +1,38 @@
+task admin is;
+task type calculador is;
+
+task admin is
+  entry getNum(out int n);
+  entry calcular(in int r);
+end admin;
+
+
+
+task body calculador is
+n,r: integer;
+begin
+  admin.getNum(n);
+  r:=factorial(n);
+  admin.calcular(r);
+end calculador;
+
+
+task body admin is
+total, cont: integer;
+begin
+    total := 0;
+	cont:= 0;
+    while (cont < 10) loop
+      select case
+         accept getNum(out int n)
+	   		 n:= rand();
+     		 end getNum;
+	     or
+	     accept calcular(in int r)
+	         total:= total + r;
+		 end calcular;
+		 cont++;
+      end case;
+    end loop;
+    put_line(total);
+end admin;

@@ -1,0 +1,41 @@
+task type maquina is;
+task coordinador is;
+
+task type maquina is
+    entry seccion(in secc: string);
+end maquina;
+
+task coordinador is
+    entry cantidadDeSeccion(cant : in integer);
+end coordinador;
+
+task body maquina is
+seccion : string;
+cant : integer;
+begin
+    
+    accept seccion(in secc : string) is
+        seccion:= secc;
+    end seccion;
+    cant := armarRollos();
+    coordinador.cantidadDeSeccion(cant);
+end coordinador;
+
+
+maquinas : array(1..4)of maquina;
+
+task body coordinador is
+  sec : array (1..4) of string 
+  total : integer;
+begin
+  total := 0;
+  for i = 1 to 4 do begin
+      maquinas(i).seccion(sec(i));
+  end for;
+  for i = 1 to 4 do begin
+        accept cantidadDeSeccion(cant : in integer)do
+           total := total + cant;
+        end cantidadDeSeccion;
+  end for;
+  put(total);
+end coordinador;

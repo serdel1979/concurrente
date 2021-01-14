@@ -1,0 +1,44 @@
+3. En un laboratorio de genética se debe administrar el uso de una máquina secuenciadora de 
+ADN. Esta máquina se puede utilizar por una única persona a la vez. Existen 100 personas
+en el laboratorio que utilizan repetidamente esta máquina para sus estudios, para esto cada
+persona pide permiso para usarla, y cuando termina el análisis avisa que termino. Cuando la
+máquina está libre se le debe adjudicar a aquella persona cuyo pedido tiene mayor prioridad
+(valor numérico entre 0 y 100). 
+
+
+permiso = record
+	persona : integer
+	prioridad : 0..100
+
+process persona[p:1..100]
+ while (true){
+  permiso per
+  per.persona = p
+  per.prioridad = generarPrioridad()
+  maquina.pedirPermiso(per)     -------------------> pasa a usar la maquina o a esperar
+  "la persona analiza su adn"
+  maquina.avisar(per)
+  }
+}
+
+monitor maquina {
+
+bool libre = true
+cond turno[100]
+queue espera
+
+procedure pedirPermiso(p: permiso in){
+if (libre) 
+	libre = false
+else {
+	insertar_ordenado(espera, p)
+	wait(turno[p.persona])
+}}
+
+procedure avisar(p: permiso out){
+
+if (empty(espera)) libre = true
+else 	{
+	pop(espera,p)
+	signal(turno[p.persona])
+}}}

@@ -1,0 +1,54 @@
+
+chan ordenes (int,texto);
+chan ordenLista[n] (texto);
+chan pedidoCocinero (int);
+chan cocinar[2] (int,texto);
+chan unaOrden[3] (texto);
+chan idvendedor (int);
+
+
+process clientes[i:1..n]{
+Text orden=""; ordenLista="";
+	orden=generaOrden();
+	send ordenes (i,orden);
+	recieve ordenLista[i] (ordenLista);	
+}
+
+
+process coordinador(){
+	int idv; Texto orden= "";
+	while true{
+		recieve idvendedor (idv);
+		if empty (ordenes)
+			send unaOrden[idv] ("nada");
+		else
+			recieve ordenes (orden);
+			send unaOrden[idv] (orden);
+	}	
+}
+
+process vendedor[i:1..3]{
+	int idcocinero; Texto orden;
+	
+	while true{
+	   send idvendedor (i);
+	   recieve unaOrden[i] (orden);
+	   recieve pedidoCocinero (idcocinero);
+	   if (orden == "nada")
+		   delay (2minutos);
+	   else
+		   send cocinar[idcocinero] (orden);
+	}	
+}
+
+
+
+process cocinero[i:1..2]{
+int idcliente; Texto orden, preparado
+while true{
+	send pedidoCocinero (i);
+	recieve cocinar[i] (dcliente,orden);
+	preparado = preparaOrden(orden);
+	send ordenLista[idcliente] (preparado);
+}
+}

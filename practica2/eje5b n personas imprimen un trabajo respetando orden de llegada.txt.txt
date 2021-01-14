@@ -1,0 +1,48 @@
+
+
+tipo_recurso impresora;
+queue cola;
+sem  mutex=1 mutex-if = 1;
+array of sem esperar[n] = ([n]0);
+Boolean ocupada= false;
+
+process persona[i:1..n]{
+  p(mutex-if);
+  if (!ocupada){
+    ocupada:=true;  
+    V(mutex-if)];
+    impresora.imprimir();
+    P(mutex)
+    if (cola.empty())
+        P(mutef-if)
+        ocupada = false;
+        v(mutex-if);
+    else
+        {
+        id = cola.pop();
+        v(esperar[id]);
+        }
+     V(mutex);
+  }else
+  
+       {
+        v(mutex-if);
+        p(mutex);
+        cola.push(i);
+        V(mutex)
+        p(esperar[i]);
+        
+        P(mutex)
+    if (cola.empty())
+        P(mutef-if)
+        ocupada = false;
+        v(mutex-if);
+    else
+        {
+        id = cola.pop();
+        v(esperar[id]);
+        }
+     V(mutex);
+
+        }    
+}

@@ -1,0 +1,38 @@
+/*Contar cuantos equipos han terminado su participacion en la carrera.
+100 participantes distribuidos en grupos de 5, cada persona de antemano
+conoce el grupo al que pertenece llamando a la funcion darEquipo.
+Cada persona cuando llega comienza a correr, no debe sincronizarse
+para empezar. Cuando termina debe esperar al resto de su equipo. Cuando 
+los 5 participantes del equipo terminaron su carrera, se incrementa en 1 
+el contador*/
+
+process participante[i:1..100]{
+int grupo;
+   
+    grupo := darEquipo();
+    //corre la carrera
+    equipo[grupo].esperar();
+}
+
+monitor equipo[1..20]{
+int cant := 0;
+cond espera;
+
+    procedure esperar(){
+		if (cant < 5){
+		   cant++;
+		   wait(espera);
+		}else
+		    {
+		    contador.incrementar();		
+			signal all (espera);
+			}
+	}	
+}
+
+monitor contador{
+	cant:= 0;	
+	procedure incrementar(){
+		   cant++;
+	}
+}

@@ -1,0 +1,72 @@
+//corregido
+
+
+
+
+process jugador[i:1..20]{
+	int e, n;
+	e := darEquipo();
+    equipo[e].esperar(n);
+	cabcha[n].llegar();
+}
+
+process partido[i:1..2]{
+	cancha[i].iniciar();
+	delay(50);
+	cancha[i].terminar();
+}
+
+monitor equipo[i:1..4]{
+	int cant:= 0;
+	cond jugador;
+	
+	procedure esperar(int : ncancha out){
+		if (cant < 5) {
+			cant++;
+			wait(jugador);
+		}
+		coordinador.obtenerCancha(ncancha);
+		signal all(jugador);
+	}
+
+}
+
+
+monitor coordinador{
+int cant:=0; cancha:=1;
+
+   procedure obtenerCancha(int n: out){
+     cant++;
+     if (cant > 2){
+         cancha++;
+        cant := 0;
+     }
+     n := cancha;    
+   }	
+}
+
+monitor cancha[i:1..2]{
+int cant:= 0;
+cond esp, ini;
+
+  procedure llegar(){
+	cant ++;
+    if (cant < 20)
+		wait(esp);
+	else
+		signal (ini);
+  }	  
+  
+  procedure iniciar(){
+	 if (cant < 20) wait(ini); 
+  }
+  
+  procedure terminar(){
+	  signal all(ini); 
+  }	
+}
+
+
+
+
+

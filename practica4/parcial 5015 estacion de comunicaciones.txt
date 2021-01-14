@@ -1,0 +1,64 @@
+
+//2- Resolver con PASAJE DE MENSAJES SINCRÓNICO (PMS). En una estación de comunicaciones se cuenta con 10 Radares, 
+//UNA Unidad de Detección, y UN Reconocedor. Cada radar repetidamente detecta señales de radio durante 15 segundos y 
+//le envía esos datos a la Unidad de Detección para que los analice. Los radares no deben esperar ningún resultado 
+//(deben volver a tomar señales lo antes posible). La Unidad de Detección, toma de a una las señales enviadas por los radares 
+//(según el orden de llegada), realiza un preprocesamiento para limpiar la señal (simular esta operación mediante la función PREPROCESAR(señal)) 
+//y envía el resultado al Reconocedor para que termine de analizar la señal (simular esta operación mediante la función ANALIZAR(señal)) y se 
+//queda esperando el resultado de este análisis para determinar el resultado final. Nota: Maximizar la concurrencia.
+
+- Primero que el radar no debe esperar a que procesen su pedido (o esperar se está procesando otro pedido), se debe usar un proceso 
+intermedio (buffer) donde se encolan los pedidos. Cuando la unidad de detección está libre le pide a este Buffer la siguiente señal analizar.
+
+- Segundo, la Unidad de detección le avisa al buffer que quiere otra señal, espera a que este se lo mande, ahí la preprocesa y se la manda  
+al reconocedor (no necesita que esté último le avise que está libre) y se queda esperando a que este le envíe el resultado. 
+
+ 
+
+
+
+
+process radar[i:1..10]{
+	img señal;
+	while true{
+	  	señal:= detectarSeñal(15s);
+		deteccion!envio(señal);		
+	}
+}
+
+
+process buffer(){
+	img señal, res;
+	queue c;
+
+	do
+		[]radar[*]?envio(señal)=>c.push(señal);
+		[](!c.empty)deteccion?sig()=>{ 
+										señal:= c.pop();
+										deteccion!proxSeñal(señal);
+										
+									 }
+	od	
+}
+
+
+process deteccion(){
+	img señal, res
+	queue c;
+	while true{
+		 buffer!sig();
+		 buffer?proxSeñal(señal);
+		 señal := procesa(señal);
+		 reconocedor!procesada(señal);
+		 reconocedor?resultado(res);
+	}	
+}
+
+process reconocedor(){
+	img señal, res;
+	while true{
+		  deteccion?procesada(señal);
+		  res = analizar(señal);
+		  reconocedor!resultado(res);
+	}	
+}

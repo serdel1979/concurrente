@@ -1,0 +1,19 @@
+program eje4{
+  queue recursos;
+  int cant=5;
+  inicializa(recursos,cant);
+  
+  process so[i:0..n]{
+  
+    tipo_recurso r;
+	while (true) {
+	
+	  <await (cant > 0); r = recurso.desencolar(); cant-->
+	  //usa r 
+	  <await (cant < 5); recurso.encolar(r); cant++>
+	
+	}
+  
+  }
+
+}
